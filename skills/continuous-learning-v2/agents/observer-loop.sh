@@ -135,16 +135,17 @@ PROMPT
   wait "$claude_pid"
   exit_code=$?
   kill "$watchdog_pid" 2>/dev/null || true
-  rm -f "$prompt_file" "$analysis_file"
+  rm -f "$prompt_file" "$analysis_file" 2>> "$LOG_FILE" || echo "[OBSERVER] WARNING: failed to clean up temp files" >> "$LOG_FILE"
 
   if [ "$exit_code" -ne 0 ]; then
     echo "[$(date)] Claude analysis failed (exit $exit_code)" >> "$LOG_FILE"
+    echo "[OBSERVER] ANALYSIS FAILED (exit $exit_code) - check $LOG_FILE" >&2
   fi
 
   if [ -f "$OBSERVATIONS_FILE" ]; then
     archive_dir="${PROJECT_DIR}/observations.archive"
     mkdir -p "$archive_dir"
-    mv "$OBSERVATIONS_FILE" "$archive_dir/processed-$(date +%Y%m%d-%H%M%S)-$$.jsonl" 2>/dev/null || true
+    mv "$OBSERVATIONS_FILE" "$archive_dir/processed-$(date +%Y%m%d-%H%M%S)-$$.jsonl" 2>> "$LOG_FILE" || echo "[OBSERVER] WARNING: failed to archive observations file" >> "$LOG_FILE"
   fi
 }
 

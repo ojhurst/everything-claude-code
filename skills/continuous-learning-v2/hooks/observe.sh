@@ -149,7 +149,7 @@ MAX_FILE_SIZE_MB=10
 # Auto-purge observation files older than 30 days (runs once per session)
 PURGE_MARKER="${PROJECT_DIR}/.last-purge"
 if [ ! -f "$PURGE_MARKER" ] || [ "$(find "$PURGE_MARKER" -mtime +1 2>/dev/null)" ]; then
-  find "${PROJECT_DIR}" -name "observations-*.jsonl" -mtime +30 -delete 2>/dev/null || true
+  find "${PROJECT_DIR}" -name "observations-*.jsonl" -mtime +30 -delete 2>> /tmp/ecc-observer.log || true
   touch "$PURGE_MARKER" 2>/dev/null || true
 fi
 
@@ -346,7 +346,7 @@ if [ "$OBSERVER_ENABLED" = "true" ]; then
         _CHECK_OBSERVER_RUNNING "${PROJECT_DIR}/.observer.pid" || true
         _CHECK_OBSERVER_RUNNING "${CONFIG_DIR}/.observer.pid" || true
         if [ ! -f "${PROJECT_DIR}/.observer.pid" ] && [ ! -f "${CONFIG_DIR}/.observer.pid" ]; then
-          nohup "${SKILL_ROOT}/agents/start-observer.sh" start >/dev/null 2>&1 &
+          nohup "${SKILL_ROOT}/agents/start-observer.sh" start >> /tmp/ecc-observer.log 2>&1 &
         fi
       ) 9>"$LAZY_START_LOCK"
     else
@@ -359,7 +359,7 @@ if [ "$OBSERVER_ENABLED" = "true" ]; then
           _CHECK_OBSERVER_RUNNING "${PROJECT_DIR}/.observer.pid" || true
           _CHECK_OBSERVER_RUNNING "${CONFIG_DIR}/.observer.pid" || true
           if [ ! -f "${PROJECT_DIR}/.observer.pid" ] && [ ! -f "${CONFIG_DIR}/.observer.pid" ]; then
-            nohup "${SKILL_ROOT}/agents/start-observer.sh" start >/dev/null 2>&1 &
+            nohup "${SKILL_ROOT}/agents/start-observer.sh" start >> /tmp/ecc-observer.log 2>&1 &
           fi
           rm -f "$LAZY_START_LOCK" 2>/dev/null || true
         )

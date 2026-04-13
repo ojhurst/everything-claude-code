@@ -143,7 +143,8 @@ def detect_project() -> dict:
             )
             if result.returncode == 0:
                 project_root = result.stdout.strip()
-        except (subprocess.TimeoutExpired, FileNotFoundError):
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            print(f"[instinct-cli] git rev-parse failed: {e}", file=sys.stderr)
             pass
 
     # Normalize: strip trailing slashes to keep basename and hash stable
